@@ -1,0 +1,28 @@
+name: mindease
+description: A Flutter app to improve mental well-being through daily mood check-ins, journaling, and community support.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ">=2.17.0 <3.0.0"
+  flutter: ">=2.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  flutter_riverpod: ^2.3.2
+  firebase_core: ^2.14.0
+  firebase_auth: ^4.9.0
+  cloud_firestore: ^4.8.2
+  shared_preferences: ^2.2.2
+  charts_flutter: ^0.12.0
+  intl: ^0.18.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
