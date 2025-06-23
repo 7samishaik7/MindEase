@@ -1,25 +1,21 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../models/mood_entry.dart';
 import 'dart:convert';
-
-final moodServiceProvider = Provider<MoodService>((ref) => MoodService());
+import '../models/mood_entry.dart';
+import 'api_client.dart';
 
 class MoodService {
-  Future<void> addMood(int mood) async {
-    final prefs = await SharedPreferences.getInstance();
-    final entriesJson = prefs.getString('mood_entries') ?? '[]';
-    final List decoded = jsonDecode(entriesJson);
-    decoded.add({'date': DateTime.now().toIso8601String(), 'mood': mood});
-    await prefs.setString('mood_entries', jsonEncode(decoded));
+  final ApiClient _client = ApiClient();
+
+  Future<bool> addMood(MoodEntry mood) async {
+    final res = await _client.post('/mood', mood.toJson());
+    return res.statusCode == 201;
   }
 
   Future<List<MoodEntry>> getMoodHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    final entriesJson = prefs.getString('mood_entries') ?? '[]';
-    final List decoded = jsonDecode(entriesJson);
-    return decoded
-        .map((e) => MoodEntry(date: DateTime.parse(e['date']), mood: e['mood']))
-        .toList();
+    final res = await _client.get('/mood/history');
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body) as List;
+      return data.map((e) => MoodEntry.fromJson(e)).toList();
+    }
+    return [];
   }
 }
