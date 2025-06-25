@@ -1,11 +1,11 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../core/constants.dart';
-import '../models/user.dart';
 import '../models/auth_response.dart';
 
 class AuthService {
-  static Future<User> signup(String name, String email, String password) async {
+  /// User signup
+  static Future<AuthResponse> signup(String name, String email, String password) async {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/signup'),
       headers: {'Content-Type': 'application/json'},
@@ -17,12 +17,13 @@ class AuthService {
     );
 
     if (response.statusCode == 200) {
-      return User.fromJson(jsonDecode(response.body));
+      return AuthResponse.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception(jsonDecode(response.body)['detail']);
+      throw Exception(_extractErrorMessage(response.body));
     }
   }
 
+  /// User login
   static Future<AuthResponse> login(String email, String password) async {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/login'),
@@ -36,7 +37,17 @@ class AuthService {
     if (response.statusCode == 200) {
       return AuthResponse.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception(jsonDecode(response.body)['detail']);
+      throw Exception(_extractErrorMessage(response.body));
+    }
+  }
+
+  /// Helper to extract `detail` error message from backend
+  static String _extractErrorMessage(String responseBody) {
+    try {
+      final decoded = jsonDecode(responseBody);
+      return decoded['detail'] ?? 'Unknown error';
+    } catch (e) {
+      return 'Unexpected error occurred';
     }
   }
 }

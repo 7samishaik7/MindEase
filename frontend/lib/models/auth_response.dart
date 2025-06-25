@@ -1,16 +1,9 @@
 class AuthResponse {
-  final String accessToken;
-  final String tokenType;
+  final String token;
 
-  AuthResponse({
-    required this.accessToken,
-    required this.tokenType,
-  });
+  AuthResponse({required this.token});
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
-    return AuthResponse(
-      accessToken: json['access_token'],
-      tokenType: json['token_type'],
-    );
+    return AuthResponse(token: json['access_token']);
   }
 }

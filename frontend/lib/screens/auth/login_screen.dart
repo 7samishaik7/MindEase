@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/journal_provider.dart';
+import '../../../providers/user_provider.dart';
+import '../../services/user_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,19 +16,31 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  dynamic _user;
+
   void handleLogin() async {
-    try {
-      await Provider.of<AuthProvider>(context, listen: false).login(
-        emailController.text.trim(),
-        passwordController.text,
-      );
-      Navigator.pushReplacementNamed(context, '/home');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login failed: ${e.toString()}")),
-      );
-    }
+  try {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final authResponse = await authProvider.login(
+      emailController.text.trim(),
+      passwordController.text,
+    );
+
+    // ✅ Pass token to JournalProvider
+    final journalProvider = Provider.of<JournalProvider>(context, listen: false);
+    journalProvider.initialize(authResponse.token);
+    await Provider.of<UserProvider>(context, listen: false).fetchUserProfile(authResponse.token);
+
+    _user = await UserService.getProfile(authResponse.token);
+
+    Navigator.pushReplacementNamed(context, '/home');
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Login failed: ${e.toString()}")),
+    );
   }
+}
+
 
   void navigateToRegister() {
     Navigator.pushNamed(context, '/register');

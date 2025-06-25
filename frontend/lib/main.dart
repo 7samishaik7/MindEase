@@ -3,9 +3,11 @@ import 'package:provider/provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/home/home_screen.dart';
+import 'screens/profile/profile_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/mood_provider.dart';
 import 'providers/journal_provider.dart';
+import 'providers/user_provider.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -15,6 +17,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => MoodProvider()),
         ChangeNotifierProvider(create: (_) => JournalProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: const MindEaseApp(),
     ),
@@ -27,6 +30,8 @@ class MindEaseApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    
+
 
     return MaterialApp(
       title: 'MindEase',
@@ -36,7 +41,9 @@ class MindEaseApp extends StatelessWidget {
       routes: {
         '/home': (_) => const HomeScreen(),
         '/login': (_) => const LoginScreen(),
-        '/register': (_) => RegisterScreen(), // 👈 Ensure this exists
+        '/register': (_) => RegisterScreen(),
+        '/profile': (_) => const ProfileScreen(),
+         // 👈 Ensure this exists
       },
     );
   }

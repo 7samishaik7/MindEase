@@ -11,11 +11,18 @@ class AuthProvider with ChangeNotifier {
   User? get user => _user;
   bool get isLoggedIn => _token != null;
 
+  /// Sign up method
   Future<void> signup(String name, String email, String password) async {
     print("[AuthProvider] Signup started with name=$name, email=$email");
     try {
-      _user = await AuthService.signup(name, email, password);
-      print("[AuthProvider] Signup successful, user=${_user?.name}");
+      // You can return user info if your backend gives it. Currently we mock it.
+      final authResponse = await AuthService.signup(name, email, password);
+      _token = authResponse.token;
+
+      
+      print("[AuthProvider] Signup successful, token=$_token");
+
+      // Optional: Fetch user info here if needed
     } catch (e) {
       print("[AuthProvider] Signup failed: $e");
       rethrow;
@@ -23,19 +30,25 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> login(String email, String password) async {
+  /// Login method
+  Future<AuthResponse> login(String email, String password) async {
     print("[AuthProvider] Login started with email=$email");
     try {
-      AuthResponse res = await AuthService.login(email, password);
-      _token = res.accessToken;
+      final res = await AuthService.login(email, password);
+      _token = res.token;
+
+      
       print("[AuthProvider] Login successful, token=$_token");
+
+      notifyListeners();
+      return res; // Return the response so other providers can use the token
     } catch (e) {
       print("[AuthProvider] Login failed: $e");
       rethrow;
     }
-    notifyListeners();
   }
 
+  /// Logout method
   void logout() {
     print("[AuthProvider] Logging out...");
     _token = null;
@@ -44,3 +57,4 @@ class AuthProvider with ChangeNotifier {
     print("[AuthProvider] Logout complete");
   }
 }
+ 

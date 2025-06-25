@@ -4,14 +4,14 @@ import '../services/user_service.dart';
 
 class UserProvider with ChangeNotifier {
   User? _currentUser;
+  String? _token;
 
   User? get currentUser => _currentUser;
 
-  final UserService _userService = UserService();
-
-  Future<void> fetchUserProfile() async {
+  Future<void> fetchUserProfile(String token) async {
+    _token = token; // store if needed later
     try {
-      _currentUser = await _userService.getProfile();
+      _currentUser = await UserService.getProfile(token);
       notifyListeners();
     } catch (e) {
       print("[UserProvider] Failed to fetch user: $e");
@@ -20,6 +20,7 @@ class UserProvider with ChangeNotifier {
 
   void clearUser() {
     _currentUser = null;
+    _token = null;
     notifyListeners();
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../providers/user_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../auth/login_screen.dart';
 
@@ -8,8 +9,10 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
-    final user = authProvider.user;
+
+    final user = userProvider.currentUser;
 
     return Scaffold(
       appBar: AppBar(title: const Text("Profile")),
@@ -31,9 +34,10 @@ class ProfileScreen extends StatelessWidget {
                     label: const Text("Logout"),
                     onPressed: () {
                       authProvider.logout();
+                      userProvider.clearUser(); // clear user on logout
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (_) => LoginScreen()),
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
                         (route) => false,
                       );
                     },
