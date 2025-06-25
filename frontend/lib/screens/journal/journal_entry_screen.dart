@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import '../../core/utils.dart';
 import '../../models/journal_entry.dart';
 import '../../providers/journal_provider.dart';
 
-class JournalEntryScreen extends ConsumerWidget {
+class JournalEntryScreen extends StatelessWidget {
   JournalEntryScreen({super.key});
 
   final _titleCtrl = TextEditingController();
   final _contentCtrl = TextEditingController();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final journalNotifier = ref.read(journalListProvider.notifier);
+  Widget build(BuildContext context) {
+    final journalProvider = Provider.of<JournalProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(title: const Text('New Journal Entry')),
@@ -39,7 +39,7 @@ class JournalEntryScreen extends ConsumerWidget {
                   timestamp: DateTime.now(),
                 );
 
-                await journalNotifier.addJournalEntry(entry);
+                await journalProvider.addJournalEntry(entry);
                 if (context.mounted) {
                   showSnack(context, "Journal entry saved!");
                   Navigator.pop(context);

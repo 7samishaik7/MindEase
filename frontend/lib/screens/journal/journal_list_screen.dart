@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import '../../models/journal_entry.dart';
 import '../../providers/journal_provider.dart';
 import 'journal_entry_screen.dart';
 
-class JournalListScreen extends ConsumerWidget {
+class JournalListScreen extends StatelessWidget {
   const JournalListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final journalEntries = ref.watch(journalListProvider);
-    final journalNotifier = ref.read(journalListProvider.notifier);
+  Widget build(BuildContext context) {
+    final journalProvider = Provider.of<JournalProvider>(context);
+    final journalEntries = journalProvider.entries;
 
     return Scaffold(
       appBar: AppBar(title: const Text('My Journal')),
       body: RefreshIndicator(
-        onRefresh: () async => await journalNotifier.fetchJournalEntries(),
+        onRefresh: () => journalProvider.fetchJournalEntries(),
         child: journalEntries.isEmpty
             ? const Center(child: Text("No entries yet."))
             : ListView.builder(

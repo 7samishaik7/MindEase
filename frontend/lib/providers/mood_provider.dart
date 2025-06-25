@@ -1,27 +1,23 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
 import '../models/mood_entry.dart';
 import '../services/mood_service.dart';
 
-final moodServiceProvider = Provider<MoodService>((ref) => MoodService());
+class MoodProvider with ChangeNotifier {
+  final MoodService _service = MoodService();
+  List<MoodEntry> _moods = [];
 
-final moodListProvider = StateNotifierProvider<MoodListNotifier, List<MoodEntry>>(
-  (ref) => MoodListNotifier(ref.read(moodServiceProvider)),
-);
-
-class MoodListNotifier extends StateNotifier<List<MoodEntry>> {
-  final MoodService _service;
-
-  MoodListNotifier(this._service) : super([]);
+  List<MoodEntry> get moods => _moods;
 
   Future<void> fetchMoods() async {
-    final moods = await _service.getMoodHistory();
-    state = moods;
+    _moods = await _service.getMoodHistory();
+    notifyListeners();
   }
 
   Future<void> addMood(MoodEntry mood) async {
     final success = await _service.addMood(mood);
     if (success) {
-      state = [...state, mood];
+      _moods.add(mood);
+      notifyListeners();
     }
   }
 }

@@ -10,8 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  provider: ^6.1.2 # or latest version
   cupertino_icons: ^1.0.2
-  flutter_riverpod: ^2.3.2
   shared_preferences: ^2.2.2
   http: ^0.13.6
   intl: ^0.18.0

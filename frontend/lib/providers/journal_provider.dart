@@ -1,27 +1,24 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
 import '../models/journal_entry.dart';
 import '../services/journal_service.dart';
 
-final journalServiceProvider = Provider<JournalService>((ref) => JournalService());
+class JournalProvider with ChangeNotifier {
+  final JournalService _service = JournalService();
 
-final journalListProvider = StateNotifierProvider<JournalListNotifier, List<JournalEntry>>(
-  (ref) => JournalListNotifier(ref.read(journalServiceProvider)),
-);
+  List<JournalEntry> _entries = [];
 
-class JournalListNotifier extends StateNotifier<List<JournalEntry>> {
-  final JournalService _service;
-
-  JournalListNotifier(this._service) : super([]);
+  List<JournalEntry> get entries => _entries;
 
   Future<void> fetchJournalEntries() async {
-    final entries = await _service.getJournalHistory();
-    state = entries;
+    _entries = await _service.getJournalHistory();
+    notifyListeners();
   }
 
   Future<void> addJournalEntry(JournalEntry entry) async {
     final success = await _service.addEntry(entry);
     if (success) {
-      state = [...state, entry];
+      _entries = [..._entries, entry];
+      notifyListeners();
     }
   }
 }

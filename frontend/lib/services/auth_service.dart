@@ -1,38 +1,42 @@
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'api_client.dart';
+import 'dart:convert';
+import '../core/constants.dart';
+import '../models/user.dart';
+import '../models/auth_response.dart';
 
 class AuthService {
-  final ApiClient _client = ApiClient();
+  static Future<User> signup(String name, String email, String password) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/auth/signup'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'name': name,
+        'email': email,
+        'password': password,
+      }),
+    );
 
-  Future<bool> login(String email, String password) async {
-    final res = await _client.post('/auth/login', {
-      'email': email,
-      'password': password,
-    });
-
-    if (res.statusCode == 200) {
-      final data = jsonDecode(res.body);
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', data['access_token']);
-      return true;
+    if (response.statusCode == 200) {
+      return User.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception(jsonDecode(response.body)['detail']);
     }
-    return false;
   }
 
-  Future<bool> register(String email, String password, String name) async {
-    final res = await _client.post('/auth/register', {
-      'email': email,
-      'password': password,
-      'name': name,
-    });
+  static Future<AuthResponse> login(String email, String password) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/auth/login'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'password': password,
+      }),
+    );
 
-    return res.statusCode == 201;
-  }
-
-  Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('token');
+    if (response.statusCode == 200) {
+      return AuthResponse.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception(jsonDecode(response.body)['detail']);
+    }
   }
 }
