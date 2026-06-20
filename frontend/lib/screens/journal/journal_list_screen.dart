@@ -4,8 +4,23 @@ import '../../models/journal_entry.dart';
 import '../../providers/journal_provider.dart';
 import 'journal_entry_screen.dart';
 
-class JournalListScreen extends StatelessWidget {
+class JournalListScreen extends StatefulWidget {
   const JournalListScreen({super.key});
+
+  @override
+  State<JournalListScreen> createState() => _JournalListScreenState();
+}
+
+class _JournalListScreenState extends State<JournalListScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    // Call fetchJournalEntries only after build is complete
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<JournalProvider>(context, listen: false).fetchJournalEntries();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +65,7 @@ class JournalListScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => JournalEntryScreen()),
+          MaterialPageRoute(builder: (_) => const JournalEntryScreen()),
         ),
         child: const Icon(Icons.add),
       ),
